@@ -15,7 +15,7 @@ app.use(
     verify: (req, res, buf) => {
       req.rawBody = buf;
     },
-  }),
+  })
 );
 
 // Connects to MongoDB on the first request (needed on Vercel) and reuses the connection after that.
@@ -30,10 +30,7 @@ app.use(async (req, res, next) => {
 });
 
 app.get("/health", (req, res) => {
-  res.json({
-    ok: true,
-    db: mongoose.connection.readyState === 1 ? "" : "not connected",
-  });
+  res.json({ ok: true, db: mongoose.connection.readyState === 1 ? "connected" : "not connected" });
 });
 
 // Meta signs these calls itself, so they do not use the x-api-key header.
