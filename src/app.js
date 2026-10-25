@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const mongoose = require("mongoose");
+const connectDB = require("./config/db");
 const requireKey = require("./middleware/requireKey");
 
 const app = express();
@@ -14,11 +15,25 @@ app.use(
     verify: (req, res, buf) => {
       req.rawBody = buf;
     },
-  })
+  }),
 );
 
+// Connects to MongoDB on the first request (needed on Vercel) and reuses the connection after that.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("Database connection failed:", err.message);
+    res.status(503).json({ error: "Database is not reachable." });
+  }
+});
+
 app.get("/health", (req, res) => {
-  res.json({ ok: true, db: mongoose.connection.readyState === 1 ? "connected" : "not connected" });
+  res.json({
+    ok: true,
+    db: mongoose.connection.readyState === 1 ? "" : "not connected",
+  });
 });
 
 // Meta signs these calls itself, so they do not use the x-api-key header.

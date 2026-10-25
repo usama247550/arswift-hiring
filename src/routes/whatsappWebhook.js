@@ -15,16 +15,21 @@ router.get("/", (req, res) => {
 });
 
 // Meta calls this for every incoming WhatsApp message.
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const secret = process.env.META_APP_SECRET;
   if (!secret) return res.status(503).json({ error: "Server is missing META_APP_SECRET." });
   if (!verifySignature(req.rawBody, req.get("x-hub-signature-256"), secret)) {
     return res.sendStatus(401);
   }
 
-  // Answer Meta straight away, then do the work.
+  // The work is finished before answering Meta. On Vercel a function can be paused
+  // right after it responds, so work left for later might never run.
+  try {
+    await processPayload(req.body);
+  } catch (err) {
+    console.error("WhatsApp webhook error:", err.message);
+  }
   res.sendStatus(200);
-  processPayload(req.body).catch((err) => console.error("WhatsApp webhook error:", err.message));
 });
 
 module.exports = router;
