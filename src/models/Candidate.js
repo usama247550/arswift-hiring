@@ -28,6 +28,8 @@ const candidateSchema = new mongoose.Schema(
     notes: { type: String, trim: true, maxlength: 2000 },
     // Set when the slot or rejection email has gone out.
     emailSentAt: { type: Date },
+    // Set when the test PDF has been emailed.
+    testSentAt: { type: Date },
   },
   { timestamps: true }
 );

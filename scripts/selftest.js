@@ -5,6 +5,7 @@ const { normalizePhone } = require("../src/utils/phone");
 const { firstFreeSlot } = require("../src/utils/slots");
 const { verifySignature } = require("../src/utils/whatsapp");
 const messages = require("../src/utils/messages");
+const { roleSlug } = require("../src/utils/slug");
 
 let failed = 0;
 function check(name, ok, detail = "") {
@@ -69,6 +70,11 @@ const slotMail = messages.slotEmail({ name: "Ayesha Rauf", role: "MERN Stack Int
 check("slot email subject", /Monday 26 October/.test(slotMail.subject) && /2:30 PM/.test(slotMail.subject), slotMail.subject);
 check("slot email body", /Regards/.test(slotMail.text) && /Hello Ayesha/.test(slotMail.text));
 check("reject email", /only considering candidates based in Faisalabad/.test(messages.rejectedEmail({ name: "Ali", role: "X" }).text));
+
+check("slug", roleSlug("E-commerce Sales Executive") === "e-commerce-sales-executive", roleSlug("E-commerce Sales Executive"));
+check("slug spaces", roleSlug("  MERN  Stack / Intern ") === "mern-stack-intern");
+const testMail = messages.testEmail({ name: "Ayesha Rauf", role: "Online Sales Executive" });
+check("test email", /Online Sales Executive/.test(testMail.subject) && /reply to this email/.test(testMail.text));
 
 if (failed) {
   console.log(`\n${failed} check(s) failed`);

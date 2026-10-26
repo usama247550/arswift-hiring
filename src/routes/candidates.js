@@ -1,6 +1,7 @@
 const express = require("express");
 const Candidate = require("../models/Candidate");
 const { emailNewCandidate } = require("../services/emailFlow");
+const { sendTest } = require("../services/testFlow");
 
 const { STATUSES } = Candidate;
 const router = express.Router();
@@ -58,6 +59,17 @@ router.post("/", async (req, res, next) => {
     if (err.name === "ValidationError") {
       return res.status(400).json({ error: Object.values(err.errors).map((e) => e.message).join(" ") });
     }
+    next(err);
+  }
+});
+
+// POST /api/candidates/:id/send-test  (the "Send test" button)
+router.post("/:id/send-test", async (req, res, next) => {
+  try {
+    const result = await sendTest(req.params.id);
+    if (result.error) return res.status(result.status).json({ error: result.error });
+    res.json(result.candidate);
+  } catch (err) {
     next(err);
   }
 });

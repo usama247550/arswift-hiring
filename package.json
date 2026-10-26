@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "seed": "node scripts/seed.js",
     "seed:clear": "node scripts/seed.js --clear",
+    "add-test": "node scripts/add-test.js",
     "selftest": "node scripts/selftest.js"
   },
   "dependencies": {

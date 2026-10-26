@@ -68,8 +68,20 @@ function noSlotsEmail(candidate) {
   };
 }
 
+function testEmail(candidate) {
+  return {
+    subject: `Your test at AR Swift: ${candidate.role}`,
+    text:
+      `Hello ${firstName(candidate)}, thank you for coming to AR Swift Private Limited.\n\n` +
+      `Your test for the ${candidate.role} position is attached as a PDF. ` +
+      `Please write your answers inside the PDF and reply to this email with the file.` +
+      signOff,
+  };
+}
+
 module.exports = {
   slotMessage,
+  testEmail,
   rejectedMessage,
   notFoundMessage,
   noSlotsMessage,
