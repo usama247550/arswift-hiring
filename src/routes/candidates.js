@@ -1,5 +1,6 @@
 const express = require("express");
 const Candidate = require("../models/Candidate");
+const { emailNewCandidate } = require("../services/emailFlow");
 
 const { STATUSES } = Candidate;
 const router = express.Router();
@@ -47,7 +48,9 @@ router.post("/", async (req, res, next) => {
   try {
     // Only these fields are accepted, so status and the Faisalabad flag can't be forced from outside.
     const candidate = await Candidate.create({ name, email, phone, role, city, notes });
-    res.status(201).json(candidate);
+    // Sends the slot or rejection email. A mail problem never loses the application.
+    const result = await emailNewCandidate(candidate);
+    res.status(201).json(result.doc || candidate);
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ error: "This email has already applied for this role." });

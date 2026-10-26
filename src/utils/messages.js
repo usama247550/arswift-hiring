@@ -43,4 +43,37 @@ function noSlotsMessage(candidate) {
   return `Hello ${firstName(candidate)}, thank you for applying. Our interview slots are full right now, and our team will contact you with a new time.`;
 }
 
-module.exports = { slotMessage, rejectedMessage, notFoundMessage, noSlotsMessage };
+// ----- Emails (same wording as WhatsApp, with a subject and a sign-off)
+const signOff = "\n\nRegards,\nAR Swift HR Team\nAR Swift Private Limited";
+
+function slotEmail(candidate) {
+  const when = new Date(candidate.interviewAt);
+  return {
+    subject: `Your interview at AR Swift: ${dateFmt.format(when)}, ${timeFmt.format(when).toUpperCase()}`,
+    text: slotMessage(candidate) + signOff,
+  };
+}
+
+function rejectedEmail(candidate) {
+  return {
+    subject: "Your application at AR Swift Private Limited",
+    text: rejectedMessage(candidate) + signOff,
+  };
+}
+
+function noSlotsEmail(candidate) {
+  return {
+    subject: "Your application at AR Swift Private Limited",
+    text: noSlotsMessage(candidate) + signOff,
+  };
+}
+
+module.exports = {
+  slotMessage,
+  rejectedMessage,
+  notFoundMessage,
+  noSlotsMessage,
+  slotEmail,
+  rejectedEmail,
+  noSlotsEmail,
+};

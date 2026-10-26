@@ -26,6 +26,8 @@ const candidateSchema = new mongoose.Schema(
     interviewAt: { type: Date },
     source: { type: String, default: "google-form", trim: true },
     notes: { type: String, trim: true, maxlength: 2000 },
+    // Set when the slot or rejection email has gone out.
+    emailSentAt: { type: Date },
   },
   { timestamps: true }
 );

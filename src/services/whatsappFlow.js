@@ -95,4 +95,4 @@ async function processPayload(payload) {
   }
 }
 
-module.exports = { processPayload };
+module.exports = { processPayload, assignSlot };

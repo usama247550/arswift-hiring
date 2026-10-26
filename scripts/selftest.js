@@ -65,6 +65,11 @@ check("signature missing", !verifySignature(body, undefined, "secret"));
 const slotText = messages.slotMessage({ name: "Ayesha Rauf", role: "MERN Stack Intern", interviewAt: karachi("2026-10-26T14:30:00Z") });
 check("slot message", /Hello Ayesha/.test(slotText) && /Monday 26 October/.test(slotText) && /2:30 PM/.test(slotText), slotText);
 
+const slotMail = messages.slotEmail({ name: "Ayesha Rauf", role: "MERN Stack Intern", interviewAt: karachi("2026-10-26T14:30:00Z") });
+check("slot email subject", /Monday 26 October/.test(slotMail.subject) && /2:30 PM/.test(slotMail.subject), slotMail.subject);
+check("slot email body", /Regards/.test(slotMail.text) && /Hello Ayesha/.test(slotMail.text));
+check("reject email", /only considering candidates based in Faisalabad/.test(messages.rejectedEmail({ name: "Ali", role: "X" }).text));
+
 if (failed) {
   console.log(`\n${failed} check(s) failed`);
   process.exit(1);
