@@ -31,4 +31,11 @@ function firstFreeSlot(now = new Date(), taken = new Set(), maxDays = 60) {
   return null;
 }
 
-module.exports = { firstFreeSlot, SLOT_STARTS };
+// Start and end (as real instants) of the Karachi calendar day that contains `now`.
+function karachiDayRange(now = new Date()) {
+  const k = new Date(now.getTime() + KARACHI_OFFSET_MS);
+  const start = new Date(Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate()) - KARACHI_OFFSET_MS);
+  return { start, end: new Date(start.getTime() + 24 * 60 * 60 * 1000) };
+}
+
+module.exports = { firstFreeSlot, karachiDayRange, SLOT_STARTS };

@@ -2,6 +2,7 @@ const express = require("express");
 const Candidate = require("../models/Candidate");
 const { emailNewCandidate } = require("../services/emailFlow");
 const { sendTest } = require("../services/testFlow");
+const { karachiDayRange } = require("../utils/slots");
 
 const { STATUSES } = Candidate;
 const router = express.Router();
@@ -17,6 +18,22 @@ router.get("/stats", async (req, res, next) => {
     const total = Object.values(byStatus).reduce((a, b) => a + b, 0);
     const faisalabad = await Candidate.countDocuments({ isFaisalabad: true });
     res.json({ total, faisalabad, byStatus });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/candidates/today  (interviews booked for today, Karachi time, earliest first)
+router.get("/today", async (req, res, next) => {
+  try {
+    const { start, end } = karachiDayRange(new Date());
+    const items = await Candidate.find({
+      interviewAt: { $gte: start, $lt: end },
+      status: { $in: ["scheduled", "arrived", "no_show"] },
+    })
+      .sort({ interviewAt: 1 })
+      .lean();
+    res.json({ items });
   } catch (err) {
     next(err);
   }

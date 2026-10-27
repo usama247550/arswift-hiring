@@ -2,7 +2,7 @@
 const crypto = require("crypto");
 const { isFaisalabad } = require("../src/utils/city");
 const { normalizePhone } = require("../src/utils/phone");
-const { firstFreeSlot } = require("../src/utils/slots");
+const { firstFreeSlot, karachiDayRange } = require("../src/utils/slots");
 const { verifySignature } = require("../src/utils/whatsapp");
 const messages = require("../src/utils/messages");
 const { roleSlug } = require("../src/utils/slug");
@@ -75,6 +75,13 @@ check("slug", roleSlug("E-commerce Sales Executive") === "e-commerce-sales-execu
 check("slug spaces", roleSlug("  MERN  Stack / Intern ") === "mern-stack-intern");
 const testMail = messages.testEmail({ name: "Ayesha Rauf", role: "Online Sales Executive" });
 check("test email", /Online Sales Executive/.test(testMail.subject) && /reply to this email/.test(testMail.text));
+
+// today in Karachi: 2026-10-26 02:00 Karachi (= 2026-10-25 21:00 UTC) still belongs to the 26th
+const range = karachiDayRange(new Date("2026-10-25T21:00:00Z"));
+check("day start", range.start.toISOString() === "2026-10-25T19:00:00.000Z", range.start.toISOString());
+check("day end", range.end.toISOString() === "2026-10-26T19:00:00.000Z", range.end.toISOString());
+const range2 = karachiDayRange(new Date("2026-10-26T18:59:00Z")); // 23:59 Karachi
+check("day end edge", range2.start.toISOString() === "2026-10-25T19:00:00.000Z");
 
 if (failed) {
   console.log(`\n${failed} check(s) failed`);
