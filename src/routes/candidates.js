@@ -42,12 +42,13 @@ router.get("/today", async (req, res, next) => {
   }
 });
 
-// GET /api/candidates?status=&q=&limit=
+// GET /api/candidates?status=&q=&limit=&page=
 router.get("/", async (req, res, next) => {
   try {
     await markNoShowsQuietly();
     const { status, q } = req.query;
-    const limit = Math.min(parseInt(req.query.limit, 10) || 100, 200);
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 200);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
     const filter = {};
     if (typeof status === "string" && STATUSES.includes(status)) filter.status = status;
@@ -57,8 +58,15 @@ router.get("/", async (req, res, next) => {
       filter.$or = [{ name: rx }, { email: rx }, { role: rx }, { city: rx }];
     }
 
-    const items = await Candidate.find(filter).sort({ createdAt: -1 }).limit(limit).lean();
-    res.json({ items });
+    const [items, total] = await Promise.all([
+      Candidate.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Candidate.countDocuments(filter),
+    ]);
+    res.json({ items, total, page, pages: Math.max(Math.ceil(total / limit), 1) });
   } catch (err) {
     next(err);
   }
