@@ -1,13 +1,10 @@
-// Interview slots: Monday to Friday, 1 hour each, Karachi time (UTC+5, no daylight saving).
-// Office hours are 10:00-17:00 and lunch is 13:30-14:30, so a day has 5 slots:
-//   10:00, 11:00, 12:00, 14:30, 15:30
+// Interview slots: Monday to Friday, one every 30 minutes, Karachi time (UTC+5, no daylight saving).
+// Office hours are 10:00-17:00 and lunch is 13:30-14:30, so a day has 12 slots:
+//   10:00 ... 13:00 and 14:30 ... 16:30
 const KARACHI_OFFSET_MS = 5 * 60 * 60 * 1000;
 const SLOT_STARTS = [
-  [10, 0],
-  [11, 0],
-  [12, 0],
-  [14, 30],
-  [15, 30],
+  [10, 0], [10, 30], [11, 0], [11, 30], [12, 0], [12, 30], [13, 0],
+  [14, 30], [15, 0], [15, 30], [16, 0], [16, 30],
 ];
 
 // `taken` is a Set of slot times in milliseconds. Returns the first free slot

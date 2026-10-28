@@ -3,7 +3,7 @@ const { isFaisalabad } = require("../utils/city");
 const { normalizePhone } = require("../utils/phone");
 
 // More statuses get added here as the flow grows (test, CEO meeting, hired...).
-const STATUSES = ["new", "scheduled", "rejected", "arrived", "no_show", "archived"];
+const STATUSES = ["new", "scheduled", "rejected", "arrived", "no_show", "passed", "failed", "archived"];
 
 const candidateSchema = new mongoose.Schema(
   {
@@ -30,6 +30,9 @@ const candidateSchema = new mongoose.Schema(
     emailSentAt: { type: Date },
     // Set when the test PDF has been emailed.
     testSentAt: { type: Date },
+    // Final meeting with the CEO, set when the test is marked as passed.
+    meetingAt: { type: Date },
+    decidedAt: { type: Date },
   },
   { timestamps: true }
 );

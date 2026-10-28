@@ -74,13 +74,27 @@ function testEmail(candidate) {
     text:
       `Hello ${firstName(candidate)}, thank you for coming to AR Swift Private Limited.\n\n` +
       `Your test for the ${candidate.role} position is attached as a PDF. ` +
-      `Please write your answers inside the PDF and reply to this email with the file.` +
+      `Please open the PDF on a laptop or computer, type your answers inside it, save it, and reply to this email with the file attached. ` +
+      `The PDF may not be editable on a phone.` +
+      signOff,
+  };
+}
+
+function passEmail(candidate, meetingAt) {
+  const when = new Date(meetingAt);
+  return {
+    subject: `Next step at AR Swift: meeting with our CEO on ${dateFmt.format(when)}`,
+    text:
+      `Hello ${firstName(candidate)}, congratulations! You have passed the test for the ${candidate.role} position at AR Swift Private Limited.\n\n` +
+      `The final step is a meeting with our CEO on ${dateFmt.format(when)} at ${timeFmt.format(when).toUpperCase()}.\n\n` +
+      `Please arrive 10 minutes early.` +
       signOff,
   };
 }
 
 module.exports = {
   slotMessage,
+  passEmail,
   testEmail,
   rejectedMessage,
   notFoundMessage,

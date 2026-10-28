@@ -38,6 +38,7 @@ app.use("/webhook/whatsapp", require("./routes/whatsappWebhook"));
 
 app.use("/api", requireKey);
 app.use("/api/candidates", require("./routes/candidates"));
+app.use("/api/review", require("./routes/review"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not found." });

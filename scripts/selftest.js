@@ -38,20 +38,25 @@ check("Saturday -> Monday 10:00", label(firstFreeSlot(karachi("2026-10-24T09:00:
 check("Sunday -> Monday 10:00", label(firstFreeSlot(karachi("2026-10-25T09:00:00Z"), new Set())) === "2026-10-26T10:00");
 check("Monday -> Tuesday 10:00", label(firstFreeSlot(karachi("2026-10-26T10:00:00Z"), new Set())) === "2026-10-27T10:00");
 
-const taken = new Set([karachi("2026-10-26T10:00:00Z").getTime(), karachi("2026-10-26T11:00:00Z").getTime()]);
-check("skips taken slots", label(firstFreeSlot(karachi("2026-10-23T12:00:00Z"), taken)) === "2026-10-26T12:00");
+const taken = new Set([karachi("2026-10-26T10:00:00Z").getTime(), karachi("2026-10-26T10:30:00Z").getTime()]);
+check("skips taken slots", label(firstFreeSlot(karachi("2026-10-23T12:00:00Z"), taken)) === "2026-10-26T11:00");
 
 // fill a whole day: the next candidate must go to the next day
 const day = new Set();
 const seen = [];
 let now = karachi("2026-10-23T12:00:00Z");
-for (let i = 0; i < 6; i++) {
+for (let i = 0; i < 13; i++) {
   const s = firstFreeSlot(now, day);
   seen.push(label(s));
   day.add(s.getTime());
 }
-check("5 slots per day", seen.slice(0, 5).every((s) => s.startsWith("2026-10-26")) && seen[5].startsWith("2026-10-27"), seen.join(" "));
-check("slot times", JSON.stringify(seen.slice(0, 5).map((s) => s.slice(11))) === JSON.stringify(["10:00", "11:00", "12:00", "14:30", "15:30"]), seen.join(" "));
+check("12 slots per day", seen.slice(0, 12).every((s) => s.startsWith("2026-10-26")) && seen[12].startsWith("2026-10-27"), seen.join(" "));
+check(
+  "slot times",
+  JSON.stringify(seen.slice(0, 12).map((s) => s.slice(11))) ===
+    JSON.stringify(["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "14:30", "15:00", "15:30", "16:00", "16:30"]),
+  seen.join(" ")
+);
 check("month rollover", label(firstFreeSlot(karachi("2026-10-30T12:00:00Z"), new Set())) === "2026-11-02T10:00");
 
 // ----- webhook signature
@@ -82,6 +87,14 @@ check("day start", range.start.toISOString() === "2026-10-25T19:00:00.000Z", ran
 check("day end", range.end.toISOString() === "2026-10-26T19:00:00.000Z", range.end.toISOString());
 const range2 = karachiDayRange(new Date("2026-10-26T18:59:00Z")); // 23:59 Karachi
 check("day end edge", range2.start.toISOString() === "2026-10-25T19:00:00.000Z");
+
+const passMail = messages.passEmail({ name: "Ayesha Rauf", role: "SEO" }, karachi("2026-10-30T14:00:00Z"));
+check("pass email", /Friday 30 October/.test(passMail.subject) && /2:00 PM/.test(passMail.text), passMail.subject + passMail.text);
+check("day start", karachiDayRange(karachi("2026-10-29T09:30:00Z")).start.getTime() === karachi("2026-10-29T00:00:00Z").getTime());
+
+const { parseKarachi } = require("../src/utils/time");
+check("parseKarachi ok", parseKarachi("2026-10-30T14:00").toISOString() === "2026-10-30T09:00:00.000Z");
+check("parseKarachi bad", parseKarachi("") === null && parseKarachi("30/10/2026") === null && parseKarachi("2026-13-45T99:00") === null);
 
 if (failed) {
   console.log(`\n${failed} check(s) failed`);

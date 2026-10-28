@@ -12,7 +12,7 @@ async function sendTest(id) {
   const candidate = await Candidate.findById(id);
   if (!candidate) return { status: 404, error: "Candidate not found." };
 
-  if (!["scheduled", "arrived"].includes(candidate.status)) {
+  if (!["scheduled", "arrived", "no_show"].includes(candidate.status)) {
     return { status: 409, error: "The test can only be sent to a candidate with a booked interview." };
   }
   if (!emailEnabled()) return { status: 503, error: "Email is not set up on the server." };

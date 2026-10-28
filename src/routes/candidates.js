@@ -2,6 +2,7 @@ const express = require("express");
 const Candidate = require("../models/Candidate");
 const { emailNewCandidate } = require("../services/emailFlow");
 const { sendTest } = require("../services/testFlow");
+const { markNoShowsQuietly } = require("../services/noShow");
 const { karachiDayRange } = require("../utils/slots");
 
 const { STATUSES } = Candidate;
@@ -10,6 +11,7 @@ const router = express.Router();
 // GET /api/candidates/stats
 router.get("/stats", async (req, res, next) => {
   try {
+    await markNoShowsQuietly();
     const rows = await Candidate.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]);
     const byStatus = Object.fromEntries(STATUSES.map((s) => [s, 0]));
     rows.forEach((r) => {
@@ -26,6 +28,7 @@ router.get("/stats", async (req, res, next) => {
 // GET /api/candidates/today  (interviews booked for today, Karachi time, earliest first)
 router.get("/today", async (req, res, next) => {
   try {
+    await markNoShowsQuietly();
     const { start, end } = karachiDayRange(new Date());
     const items = await Candidate.find({
       interviewAt: { $gte: start, $lt: end },
@@ -42,6 +45,7 @@ router.get("/today", async (req, res, next) => {
 // GET /api/candidates?status=&q=&limit=
 router.get("/", async (req, res, next) => {
   try {
+    await markNoShowsQuietly();
     const { status, q } = req.query;
     const limit = Math.min(parseInt(req.query.limit, 10) || 100, 200);
 
