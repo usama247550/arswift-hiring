@@ -2,6 +2,7 @@ const Candidate = require("../models/Candidate");
 const { assignSlot } = require("./whatsappFlow");
 const { emailEnabled, sendMail } = require("../utils/mailer");
 const messages = require("../utils/messages");
+const { inviteCeo } = require("./calendarInvite");
 
 // Runs right after the Google Form creates a candidate:
 //   Faisalabad  -> first free slot + slot email
@@ -37,6 +38,7 @@ async function emailNewCandidate(candidate) {
     try {
       await sendMail({ to: doc.email, ...mail });
       doc = (await Candidate.findByIdAndUpdate(doc._id, { emailSentAt: new Date() }, { new: true })) || doc;
+      if (doc.status === "scheduled" && doc.interviewAt) await inviteCeo(doc, doc.interviewAt, "interview");
       return { state: "sent", doc };
     } catch (err) {
       console.error("Could not send email:", err.message);

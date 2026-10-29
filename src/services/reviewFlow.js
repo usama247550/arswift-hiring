@@ -1,3 +1,4 @@
+const { inviteCeo } = require("./calendarInvite");
 const mongoose = require("mongoose");
 const Candidate = require("../models/Candidate");
 const Submission = require("../models/Submission");
@@ -70,6 +71,7 @@ async function passCandidate(id, meetingText) {
   candidate.meetingAt = meetingAt;
   candidate.decidedAt = new Date();
   await candidate.save();
+  await inviteCeo(candidate, meetingAt, "meeting");
   return { candidate };
 }
 

@@ -23,9 +23,9 @@ function getTransporter() {
   return transporter;
 }
 
-async function sendMail({ to, subject, text, attachments }) {
+async function sendMail({ to, subject, text, attachments, icalEvent }) {
   const from = process.env.MAIL_FROM || `"AR Swift HR" <${process.env.SMTP_USER}>`;
-  await getTransporter().sendMail({ from, to, subject, text, attachments });
+  await getTransporter().sendMail({ from, to, subject, text, attachments, icalEvent });
 }
 
 module.exports = { emailEnabled, sendMail };
